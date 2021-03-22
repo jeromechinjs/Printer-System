@@ -1,0 +1,77 @@
+creditStored = [] 
+nameList = []
+studentIndex = 0                                              #used for accessing student's printing credit in creditStored list
+doesItExist = "False"                                         #check if the student name exist or not, initially it's false to append the first name entered
+
+def topUp():
+  try:                                                                                 #data validation for payement input (integer data type speciifed)
+    payment = int(input("How much do you want to pay: ")) 
+  except ValueError: 
+    payment = int(input("Invalid input, enter payment again: "))                      
+  while payment <= 0:                                                                  #this loop makes sure input isn't a negative value
+    payment = int(input("Error! Please input again how much do you want to pay: "))   
+
+  printingCredit = payment * 25                                                        #calculations for amount of credit given
+  if payment >= 20:
+    printingCredit = printingCredit + 50
+  elif 10 <= payment <= 19:
+    printingCredit = printingCredit + 25
+  
+  if doesItExist == "False":                               #will add the printing credit to the end of the creditStored list (for new student names only)    
+    creditStored.append(printingCredit)
+  else:
+    creditStored[studentIndex] = creditStored[studentIndex] + printingCredit                       #updates existing student's printing credit account       
+  print("You have received: ",printingCredit,"printing credits."," Current total of",creditStored[studentIndex],"printing credits.") 
+  print("_________________________________________________________________")                       #makes output more visually appealing
+
+def printing():
+  print("You currently have",creditStored[studentIndex],"printing credits") 
+  try:                                                                                 #data validation for pages input (interger data type specified)
+    pages = int(input("How many pages do you want to print: ")) 
+  except ValueError: 
+    pages = int(input("Invalid input. Input pages again:")) 
+  
+  while pages > creditStored[studentIndex]:                              #ensures students account has enough printing credits to pay for prinitng cost
+    pages = int(input("Not enough printing credit, enter again : ")) 
+  creditStored[studentIndex] = creditStored[studentIndex] - pages        #updates student's printingCredit account
+  print("You have printed",pages,"pages","You still have",creditStored[studentIndex],"printing credits left.")
+  print("_________________________________________________________________") 
+
+while True:
+  counter = 0                                                     #keep tracks number of loops used to find existing name. 0 resets the loop number
+  studentName = input("Enter name: ")
+  for a in studentName:                                           #ensure student' name input doesn't contain any number/symbol
+    if a.isspace() == True:
+      pass
+    elif a.isalpha() == False:
+      studentName = input("Error. Enter name again: ")
+      break    
+  if len(nameList) > 0:                              #if name list has at least one name in the list only then it will start to check for existing names
+    for a in nameList:                               #this loop checks whether the name entered is in the name list 
+        if a == studentName: 
+          doesItExist = "True"                       #indicates student name has been found
+          studentIndex = counter                     #student's index number will be based on the number of loops used to find the existing name
+          break                                      #if student's name exists in the nameList thenstop the FOR-IN loop from continuing
+        else:
+          doesItExist = "False"                           
+          counter += 1                               #adds 1 to the loop counter, indicating one cycle has finished
+
+  if doesItExist == "False":                         
+    nameList.append(studentName)                     #if student name wasn't in the list, adds the name at the back of nameList
+    studentIndex = counter
+
+  chooseOption = input("To print, press (1); To top-up, press (2): ")                                 #asks whether student wants to print or top up
+  while int(chooseOption) < 1 or int(chooseOption) > 2:                                               #this make sure iinput for chooseOption is valid
+      chooseOption = input("Error. To print, press (1); To top-up, press (2): ") 
+  if chooseOption == "1":
+    if doesItExist == "False":                                                                       
+      print("Your account has 0 printing credits, please top up first")          #if student's name is new but wanted to print, tells student to top up first
+      nameList.pop()                              #deletes the last name in nameList to ensure studentIndex in both lists (creditStored/nameList) are aligned
+      print("______________________________________________________________") 
+    elif doesItExist == "True" and creditStored[studentIndex] == 0:             #if the existing student wanted to print but has no credits , tell student to top up first
+      print("Your account has 0 printing credits, please top up first")
+      print("______________________________________________________________")         
+    else:
+      printing() 
+  else:
+    topUp() 
